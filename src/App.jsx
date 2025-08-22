@@ -26,7 +26,7 @@ export default function App() {
 
   const [tab, setTab] = useState("branch");
   const [useLive, setUseLive] = useState(false);
-  const [apiBase, setApiBase] = useState("http://localhost:8000");
+ const [apiBase, setApiBase] = useState(import.meta.env.VITE_API_BASE || "http://localhost:8000");
 
   // in-memory
   const [reports, setReports] = useState(demoReports);
