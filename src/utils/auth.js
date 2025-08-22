@@ -7,12 +7,12 @@ export function login({ username, password, roleHint }) {
   if (!username || !password) throw new Error('กรอกข้อมูลให้ครบ');
 
   if (roleHint === 'branch') {
-    if (/^[A-Za-z]{2,}-?d{2,}$/i.test(username) || username.toLowerCase().startsWith('br-')) {
+    if (/^\d+$/.test(username))  {
       localStorage.setItem(KEYS.token, 'branch_token');
       localStorage.setItem(KEYS.role, 'branch');
       return { role: 'branch' };
     }
-    throw new Error('กรุณากรอกรหัสสาขาถูกต้อง เช่น BR-001');
+    throw new Error('กรุณากรอกรหัสสาขา');
   }
 
   if (roleHint === 'admin') {

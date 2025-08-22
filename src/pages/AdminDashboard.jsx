@@ -1,77 +1,116 @@
-import React from 'react';
+import React from "react";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Filter, Settings2 } from "lucide-react";
+import SectionHeader from "@/components/SectionHeader";
+import CategoryBarChart from "@/components/charts/CategoryBarChart";
+import SlaPieChart from "@/components/charts/SlaPieChart";
+import { CATEGORIES } from "@/utils/classify";
 
-export default function AdminDashboard() {
+const STATUSES = ["NEW", "ASSIGNED", "IN_PROGRESS", "DONE", "BREACHED"];
+
+export default function AdminDashboard({
+  filters,
+  setFilters,
+  filteredReports,
+  reports,
+  dashboard,
+  updateStatus,
+  catChartColors,
+}) {
   return (
-    <div className="mx-auto max-w-6xl p-6">
-      <div className="grid md:grid-cols-3 gap-6">
-        <div className="card p-6">
-          <h3 className="text-slate-700 font-semibold">งานใหม่วันนี้</h3>
-          <p className="text-3xl font-bold text-slate-900 mt-2">12</p>
-        </div>
-        <div className="card p-6">
-          <h3 className="text-slate-700 font-semibold">กำลังดำเนินการ</h3>
-          <p className="text-3xl font-bold text-slate-900 mt-2">34</p>
-        </div>
-        <div className="card p-6">
-          <h3 className="text-slate-700 font-semibold">SLA เกินกำหนด</h3>
-          <p className="text-3xl font-bold text-red-600 mt-2">3</p>
-        </div>
-      </div>
-
-      <div className="card p-6 mt-6">
-        <h1 className="text-xl font-semibold text-slate-800">แดชบอร์ดแอดมิน</h1>
-        <p className="text-slate-500 text-sm">ตัวอย่างหน้าเพื่อ Monitor งานซ่อมและ SLA</p>
-        <div className="mt-4 flex gap-3">
-          <select className="input">
-            <option>ทุกหมวดหมู่</option>
-            <option>ประปา</option>
-            <option>แอร์</option>
-            <option>ไฟฟ้า</option>
-          </select>
-          <select className="input">
-            <option>ทุก Region</option>
-            <option>North</option>
-            <option>Central</option>
-            <option>South</option>
-          </select>
-          <select className="input">
-            <option>ทุกจังหวัด</option>
-            <option>กรุงเทพฯ</option>
-            <option>เชียงใหม่</option>
-            <option>ภูเก็ต</option>
-          </select>
-          <button className="btn-secondary">รีเฟรช</button>
-        </div>
-
-        <div className="mt-6 overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="text-left text-slate-600">
-                <th className="py-2">เลขที่งาน</th>
-                <th>หัวข้อ</th>
-                <th>หมวดหมู่</th>
-                <th>สาขา</th>
-                <th>จังหวัด</th>
-                <th>SLA</th>
-                <th>สถานะ</th>
-              </tr>
-            </thead>
-            <tbody>
-              {Array.from({length:6}).map((_,i)=> (
-                <tr key={i} className="border-t hover:bg-slate-50/60">
-                  <td className="py-2">WO-24-{1000+i}</td>
-                  <td>ซ่อมแอร์ชั้น 3</td>
-                  <td>แอร์</td>
-                  <td>BR-00{i+1}</td>
-                  <td>กรุงเทพฯ</td>
-                  <td>8 ชม.</td>
-                  <td><span className="px-2 py-1 rounded-lg bg-amber-100 text-amber-700">รอดำเนินการ</span></td>
-                </tr>
+    <div className="grid md:grid-cols-5 gap-4">
+      <Card className="md:col-span-2">
+        <CardHeader>
+          <SectionHeader icon={Filter} title="ตัวกรองงานซ่อม" subtitle="เลือกตามหมวด/Region/จังหวัด/สถานะ" />
+        </CardHeader>
+        <CardContent className="space-y-3">
+          <div className="grid grid-cols-2 gap-3">
+            <select
+              className="border rounded-xl px-3 py-2"
+              value={filters.category}
+              onChange={(e) => setFilters({ ...filters, category: e.target.value })}
+            >
+              <option value="">ทุกหมวด</option>
+              {CATEGORIES.map((c) => (
+                <option key={c} value={c}>
+                  {c}
+                </option>
               ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
+            </select>
+
+            <select
+              className="border rounded-xl px-3 py-2"
+              value={filters.status}
+              onChange={(e) => setFilters({ ...filters, status: e.target.value })}
+            >
+              <option value="">ทุกสถานะ</option>
+              {STATUSES.map((s) => (
+                <option key={s} value={s}>
+                  {s}
+                </option>
+              ))}
+            </select>
+
+            <input
+              className="border rounded-xl px-3 py-2"
+              placeholder="Region"
+              value={filters.region}
+              onChange={(e) => setFilters({ ...filters, region: e.target.value })}
+            />
+            <input
+              className="border rounded-xl px-3 py-2"
+              placeholder="จังหวัด"
+              value={filters.province}
+              onChange={(e) => setFilters({ ...filters, province: e.target.value })}
+            />
+          </div>
+
+          <div className="text-sm text-sky-700">{filteredReports.length} รายการ</div>
+
+          <div className="max-h-80 overflow-auto">
+            {filteredReports.map((r) => (
+              <div key={r.id} className="border rounded-xl p-3 mb-3 bg-white">
+                <div className="flex items-center justify-between">
+                  <div className="font-medium text-sky-900">{r.title}</div>
+                  <span className="text-xs text-sky-600">{new Date(r.created_at).toLocaleString()}</span>
+                </div>
+                <div className="text-sm text-sky-700/80">{r.description}</div>
+                <div className="mt-2 flex flex-wrap gap-2">
+                  <Badge className="bg-sky-100 text-sky-700">{r.category}</Badge>
+                  <Badge variant="outline">{r.address.region}</Badge>
+                  <Badge variant="outline">{r.address.province}</Badge>
+                  <Badge variant="outline">SLA {r.sla_hours} ชม.</Badge>
+                  <Badge variant="outline">สถานะ {r.status}</Badge>
+                </div>
+                <div className="mt-2 flex gap-2 flex-wrap">
+                  {STATUSES.map((s) => (
+                    <button
+                      key={s}
+                      onClick={() => updateStatus(r.id, s)}
+                      className={`px-2 py-1 rounded-lg text-xs border ${r.status === s ? "bg-sky-600 text-white" : "bg-white"}`}
+                    >
+                      {s}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card className="md:col-span-3">
+        <CardHeader>
+          <SectionHeader icon={Settings2} title="แดชบอร์ดงานซ่อม" subtitle="จำนวนงานตามหมวด + งานเกิน SLA" />
+        </CardHeader>
+        <CardContent>
+          <div className="grid md:grid-cols-2 gap-4">
+            <CategoryBarChart data={dashboard.catData} colors={catChartColors} />
+            <SlaPieChart inSla={reports.length - dashboard.breached} breached={dashboard.breached} />
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { login } from '../utils/auth';
 import { useNavigate } from 'react-router-dom';
 import { Building2, ShieldCheck, Sparkles } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 export default function LoginUnified() {
   const [tab, setTab] = useState('branch');
@@ -10,6 +11,7 @@ export default function LoginUnified() {
   const [err, setErr] = useState('');
   const navigate = useNavigate();
 
+
   const onSubmit = (e) => {
     e.preventDefault();
     setErr('');
@@ -17,6 +19,7 @@ export default function LoginUnified() {
       const { role } = login({ username, password, roleHint: tab });
       if (role === 'branch') navigate('/branch/report');
       if (role === 'admin') navigate('/admin/dashboard');
+      if (role === 'contractor') navigate('/contractor/task');
     } catch (e) {
       setErr(e.message);
     }
@@ -31,7 +34,7 @@ export default function LoginUnified() {
           </div>
           <div>
             <h1 className="text-xl font-semibold text-slate-800">เข้าสู่ระบบ (สาขา & แอดมิน)</h1>
-            <p className="text-slate-500 text-sm">สาขาใช้ <b>รหัสสาขา</b> เป็น username (เช่น BR-001)</p>
+            <p className="text-slate-500 text-sm">สาขาใช้ <b>รหัสสาขา</b> เป็น username</p>
           </div>
         </div>
 
@@ -43,7 +46,7 @@ export default function LoginUnified() {
         <form onSubmit={onSubmit} className="space-y-4">
           <div>
             <label className="label">Username</label>
-            <input className="input w-full mt-1" placeholder={tab==='branch' ? 'รหัสสาขา เช่น BR-001' : 'admin'} value={username} onChange={(e)=>setUsername(e.target.value)} />
+            <input className="input w-full mt-1" placeholder={tab==='branch' ? 'รหัสสาขา' : 'admin'} value={username} onChange={(e)=>setUsername(e.target.value)} />
           </div>
           <div>
             <label className="label">Password</label>
@@ -56,9 +59,9 @@ export default function LoginUnified() {
         <div className="mt-6 text-sm text-slate-600 flex flex-wrap items-center gap-2">
           <Building2 size={16} />
           <span>ผู้รับเหมา? ไปที่</span>
-          <a className="text-brand-700 underline" href="/contractor/login">หน้า Login ผู้รับเหมา</a>
+          <Link className="text-brand-700 underline" to="/contractor/login">หน้า Login ผู้รับเหมา</Link>
           <span>หรือ</span>
-          <a className="text-brand-700 underline" href="/contractor/register">ลงทะเบียนใหม่</a>
+          <Link className="text-brand-700 underline" to="/contractor/register">ลงทะเบียนใหม่</Link>
           <Sparkles size={16} className="text-brand-600"/>
         </div>
       </div>
